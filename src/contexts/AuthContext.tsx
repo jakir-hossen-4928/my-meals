@@ -1,12 +1,13 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { User, onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut } from "firebase/auth";
-import { auth, googleProvider } from "@/lib/firebase";
-import { useNavigate } from "react-router-dom";
+import { User, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import { syncService } from "@/lib/sync";
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -17,19 +18,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+
+      // Initialize sync when user logs in
+      if (user) {
+        try {
+          await syncService.pullFromFirebase(user.uid);
+          syncService.syncAll(user.uid);
+        } catch (error) {
+          console.error("Error initializing sync:", error);
+        }
+      }
+
       setLoading(false);
     });
 
     return unsubscribe;
   }, []);
 
-  const signInWithGoogle = async () => {
+  const signUp = async (email: string, password: string) => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      await createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
-      console.error("Error signing in with Google:", error);
+      console.error("Error signing up:", error);
+      throw error;
+    }
+  };
+
+  const signIn = async (email: string, password: string) => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      console.error("Error signing in:", error);
       throw error;
     }
   };
@@ -44,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

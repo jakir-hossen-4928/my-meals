@@ -3,13 +3,13 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBXkXWKjSL70UcfdcvJcHOTnOri0uxfiqo",
-  authDomain: "meal-tracker-40679.firebaseapp.com",
-  projectId: "meal-tracker-40679",
-  storageBucket: "meal-tracker-40679.firebasestorage.app",
-  messagingSenderId: "739073668697",
-  appId: "1:739073668697:web:0ad0ce737e5f568f1c2348",
-  measurementId: "G-RT3C43FS4N"
+  apiKey: "AIzaSyCD63wwCMsyPd0FQDKwgUsBdcUorx7qwUY",
+  authDomain: "my-meals-4928.firebaseapp.com",
+  projectId: "my-meals-4928",
+  storageBucket: "my-meals-4928.firebasestorage.app",
+  messagingSenderId: "340315362976",
+  appId: "1:340315362976:web:c777fce27b586b50cedbc5",
+  measurementId: "G-DYWW0P9LTV"
 };
 
 // Initialize Firebase
